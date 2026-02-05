@@ -75,7 +75,7 @@ The active account is also synced to:
 
 ## 🖼️ Screenshots
 
-*Coming soon*
+![Capture](https://github.com/user-attachments/assets/abb8e0f8-5336-4f1b-960e-f4b68af78b19)
 
 ## 🛠️ Development
 
