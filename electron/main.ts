@@ -36,6 +36,7 @@ function createWindow() {
             preload: path.join(__dirname, 'preload.mjs'),
         },
         backgroundColor: '#1e1e1e', // Dark mode base
+        icon: path.join(process.env.VITE_PUBLIC as string, 'icon.jpg'),
     });
 
     monitorService.setWindow(win);
@@ -46,7 +47,7 @@ function createWindow() {
     });
 
     // Open DevTools
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
 
     if (VITE_DEV_SERVER_URL) {
         win.loadURL(VITE_DEV_SERVER_URL);
