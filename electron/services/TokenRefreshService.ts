@@ -28,8 +28,15 @@ export class TokenRefreshService {
         const accounts = await this.fileService.getAllAccounts();
         const now = Date.now();
         for (const acc of accounts) {
-            if (acc.expiryDate - now < 300000) { // 5 mins
-                await this.refreshAccount(acc.id);
+            // Refresh if expiring in next hour (was 5 mins - too short)
+            if (acc.expiryDate - now < 3600000) {
+                console.log(`[TokenRefresh] Refreshing ${acc.email}...`);
+                const result = await this.refreshAccount(acc.id);
+                if (result.success) {
+                    console.log(`[TokenRefresh] ✅ ${acc.email} refreshed successfully`);
+                } else {
+                    console.log(`[TokenRefresh] ❌ ${acc.email} failed:`, result.error);
+                }
             }
         }
     }

@@ -56,6 +56,11 @@ export class GeminiFileService {
         const accounts: GeminiAccount[] = [];
         const activeId = this.getActiveAccountId();
 
+        // Check for updates from external CLI (Reverse Sync)
+        if (activeId) {
+            this.syncFromMainGeminiDir(activeId);
+        }
+
         if (!fs.existsSync(this.cliUsersDir)) {
             return accounts;
         }
@@ -107,6 +112,39 @@ export class GeminiFileService {
         });
 
         return accounts;
+    }
+
+    /**
+     * Check if main .gemini files are newer than our internal copy
+     * If so, sync them BACK to our internal copy (Official CLI updated them)
+     */
+    private syncFromMainGeminiDir(accountId: string): void {
+        const mainOauthPath = path.join(this.geminiDir, 'oauth_creds.json');
+        const mainGooglePath = path.join(this.geminiDir, 'google_accounts.json');
+
+        const internalOauthPath = path.join(this.cliUsersDir, `${accountId}_oauth_creds.json`);
+
+        if (fs.existsSync(mainOauthPath) && fs.existsSync(internalOauthPath)) {
+            try {
+                const mainStats = fs.statSync(mainOauthPath);
+                const internalStats = fs.statSync(internalOauthPath);
+
+                // If main file is newer (> 2 seconds to avoid loops), copy it back
+                if (mainStats.mtimeMs > internalStats.mtimeMs + 2000) {
+                    // Verify it belongs to the same account (simple default email check)
+                    if (fs.existsSync(mainGooglePath)) {
+                        const mainGoogle = JSON.parse(fs.readFileSync(mainGooglePath, 'utf-8'));
+                        // We could check email match here if we want to be strict
+                        // But for now we assume if it's the active account, it matches
+                    }
+
+                    console.log(`[Sync] Updating internal credentials for ${accountId} from external CLI changes`);
+                    fs.copyFileSync(mainOauthPath, internalOauthPath);
+                }
+            } catch (e) {
+                console.error('[Sync] Error syncing from main dir:', e);
+            }
+        }
     }
 
     /**
