@@ -133,7 +133,7 @@ export class GeminiFileService {
                 if (mainStats.mtimeMs > internalStats.mtimeMs + 2000) {
                     // Verify it belongs to the same account (simple default email check)
                     if (fs.existsSync(mainGooglePath)) {
-                        const mainGoogle = JSON.parse(fs.readFileSync(mainGooglePath, 'utf-8'));
+                        // const mainGoogle = JSON.parse(fs.readFileSync(mainGooglePath, 'utf-8'));
                         // We could check email match here if we want to be strict
                         // But for now we assume if it's the active account, it matches
                     }
